@@ -98,9 +98,9 @@ public class AddDecLockTestMain {
 
 
 	private static class TestRunnable implements Runnable {
-		CountDownLatch countDownLatch;
-		private int id;
-		private ILocker locker;
+		private final CountDownLatch countDownLatch;
+		private final int id;
+		private final ILocker locker;
 
 		TestRunnable(int id, ILocker locker, CountDownLatch countDownLatch) {
 			this.id = id;
