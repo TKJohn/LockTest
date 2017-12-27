@@ -5,9 +5,10 @@ Result:
 
 |Benchmark                                        |Mode  |Cnt  |   Score |    Error  |Units|
 |-------------------------------------------------|------|-----|---------|-----------|-----|
-|AddDecLockTestMain.doubleSynchronizedLockerTest  |avgt  | 10  |1897.903 |±  34.252  |ms/op|
-|AddDecLockTestMain.reentrantLockLocker           |avgt  | 10  |5409.243 |± 310.933  |ms/op|
-|AddDecLockTestMain.singleSynchronizedLockerTest  |avgt  | 10  |6818.001 |± 649.110  |ms/op|
+|AddDecLockTestMain.doubleSynchronizedLockerTest  |avgt  | 10  |1851.551 |±  19.539  |ms/op|
+|AddDecLockTestMain.reentrantLockLocker           |avgt  | 10  |4534.705 |± 173.604  |ms/op|
+|AddDecLockTestMain.singleSynchronizedLockerTest  |avgt  | 10  |6149.102 |± 342.512  |ms/op|
+
 
 
 Environment:

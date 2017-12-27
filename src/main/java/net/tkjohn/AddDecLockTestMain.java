@@ -8,12 +8,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Fork(2)
+@Measurement(iterations = 5)
+@Warmup(iterations = 5)
 public class AddDecLockTestMain {
+    private static final int PARALLEL_SIZE = 1000;
+    private static final int TIMES_PER_THREAD = 500;
 
-    private static final int parallelSize = 1000;
-    private static final int times = 500;
-
-    private static ExecutorService executorService;
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(PARALLEL_SIZE);
 
     public static void main(String[] args) throws InterruptedException {
         AddDecLockTestMain testMain = new AddDecLockTestMain();
@@ -28,7 +32,6 @@ public class AddDecLockTestMain {
 
     @Setup
     public void setup() {
-        executorService = Executors.newFixedThreadPool(parallelSize);
     }
 
     @TearDown
@@ -37,50 +40,24 @@ public class AddDecLockTestMain {
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(2)
-    @Measurement(iterations = 5)
-    @Warmup(iterations = 5)
     public void doubleSynchronizedLockerTest() throws InterruptedException {
-        ILocker locker = new DoubleSynchronizedLocker();
-        CountDownLatch countDownLatch = new CountDownLatch(parallelSize);
-
-        for (int i = 0; i < parallelSize; i++) {
-            executorService.submit(new TestRunnable(i, locker, countDownLatch));
-        }
-
-        countDownLatch.await();
+        lockerRunner(new DoubleSynchronizedLocker());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(2)
-    @Measurement(iterations = 5)
-    @Warmup(iterations = 5)
     public void singleSynchronizedLockerTest() throws InterruptedException {
-        ILocker locker = new SingleSynchronizedLocker();
-        CountDownLatch countDownLatch = new CountDownLatch(parallelSize);
-
-        for (int i = 0; i < parallelSize; i++) {
-            executorService.submit(new TestRunnable(i, locker, countDownLatch));
-        }
-
-        countDownLatch.await();
+        lockerRunner(new SingleSynchronizedLocker());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(2)
-    @Measurement(iterations = 5)
-    @Warmup(iterations = 5)
     public void reentrantLockLocker() throws InterruptedException {
-        ILocker locker = new ReentrantLockLocker();
-        CountDownLatch countDownLatch = new CountDownLatch(parallelSize);
+        lockerRunner(new ReentrantLockLocker());
+    }
 
-        for (int i = 0; i < parallelSize; i++) {
+    private void lockerRunner(ILocker locker) throws InterruptedException {
+        CountDownLatch countDownLatch = new CountDownLatch(PARALLEL_SIZE);
+
+        for (int i = 0; i < PARALLEL_SIZE; i++) {
             executorService.submit(new TestRunnable(i, locker, countDownLatch));
         }
 
@@ -101,7 +78,7 @@ public class AddDecLockTestMain {
         @Override
         public void run() {
             try {
-                for (int i = 0; i < times; i++) {
+                for (int i = 0; i < TIMES_PER_THREAD; i++) {
                     if (doingInc) {
                         locker.inc();
                     } else {
